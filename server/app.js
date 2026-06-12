@@ -34,7 +34,11 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:", "https:"],
       fontSrc: ["'self'"],
-      connectSrc: ["'self'"],
+      connectSrc: [
+      "'self'",
+      "https://passwordsaver-xv0f.onrender.com",
+      "https://passwordsaver-peach.vercel.app"
+    ],
       frameAncestors: ["'none'"],
       formAction: ["'self'"]
     }
