@@ -1,5 +1,14 @@
 import axios from 'axios';
-const api = axios.create({ baseURL: '/api/backup', withCredentials: true });
+//for deployee const api = axios.create({ baseURL: '/api/backup', withCredentials: true });
+
+const api_url =
+  import.meta.env.VITE_API_URL || '';
+
+const api = axios.create({
+  baseURL: `${api_url}/api/backup`,
+  withCredentials: true
+});
+
 api.interceptors.response.use(res => res.data, err => Promise.reject(err.response?.data || err));
 
 export const backupApi = {

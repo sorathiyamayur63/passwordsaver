@@ -1,8 +1,13 @@
 import axios from 'axios';
 
 // Create a dedicated client that securely forwards HttpOnly cookies
+//for deployee const api = axios.create({baseURL: '/api', withCredentials: true });
+
+const api_url =
+  import.meta.env.VITE_API_URL || '';
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${api_url}/api`,
   withCredentials: true
 });
 

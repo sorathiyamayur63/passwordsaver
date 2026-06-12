@@ -1,14 +1,22 @@
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 
-export const authClient = axios.create({
-  baseURL: '/api/auth',
+const api_url =
+  import.meta.env.VITE_API_URL || '';
 
-  withCredentials: true, // CRITICAL: Ensures HttpOnly cookies are sent
+export const authClient = axios.create({
+  baseURL: `${api_url}/api/auth`,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
   }
 });
+
+
+
+
+
+
 
 // Request Interceptor: Add unique request ID for tracing
 authClient.interceptors.request.use((config) => {

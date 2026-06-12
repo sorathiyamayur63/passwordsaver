@@ -1,6 +1,14 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '/api/devices', withCredentials: true });
+//for deployee const api = axios.create({ baseURL: '/api/devices', withCredentials: true });
+
+const api_url =
+  import.meta.env.VITE_API_URL || '';
+
+const api = axios.create({
+  baseURL: `${api_url}/api/devices`,
+  withCredentials: true
+});
 
 api.interceptors.response.use(res => res.data, err => Promise.reject(err.response?.data || err));
 

@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+//for deployee const api = axios.create({ baseURL: '/api/templates', withCredentials: true});
+
+const api_url =
+  import.meta.env.VITE_API_URL || '';
+
 const api = axios.create({
-  baseURL: '/api/templates',
+  baseURL: `${api_url}/api/templates`,
   withCredentials: true
 });
 
