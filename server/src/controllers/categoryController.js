@@ -1,6 +1,8 @@
 import { Category, VaultItem, AuditLog } from '../models/index.js';
 import { hashIp } from '../services/deviceService.js';
 
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 export const getCategories = async (req, res, next) => {
   try {
     let categories = await Category.find({ userId: req.userId })
@@ -26,7 +28,7 @@ export const createCategory = async (req, res, next) => {
   try {
     const { name, icon, color } = req.body;
 
-    const existing = await Category.findOne({ userId: req.userId, name: new RegExp(`^${name}$`, 'i') });
+    const existing = await Category.findOne({ userId: req.userId, name: new RegExp(`^${escapeRegex(name)}$`, 'i') });
     if (existing) {
       return res.status(409).json({ success: false, message: 'Category name already exists' });
     }
@@ -72,7 +74,7 @@ export const updateCategory = async (req, res, next) => {
     if (name) {
       const existing = await Category.findOne({ 
         userId: req.userId, 
-        name: new RegExp(`^${name}$`, 'i'), 
+        name: new RegExp(`^${escapeRegex(name)}$`, 'i'), 
         uuid: { $ne: category.uuid } 
       });
       if (existing) {

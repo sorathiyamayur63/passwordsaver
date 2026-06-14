@@ -32,7 +32,7 @@ export const updateUsername = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Incorrect current password' });
     }
 
-    const existing = await User.findOne({ username: new RegExp(`^${newUsername}$`, 'i'), _id: { $ne: user._id } });
+    const existing = await User.findOne({ username: newUsername.toLowerCase(), _id: { $ne: user._id } });
     if (existing) {
       return res.status(409).json({ success: false, message: 'Username is already taken' });
     }
@@ -105,6 +105,18 @@ export const deleteAccount = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Incorrect password' });
     }
 
+    // Hard delete all associated data
+    await Promise.all([
+      VaultItem.deleteMany({ userId: req.userId }),
+      Category.deleteMany({ userId: req.userId }),
+      Template.deleteMany({ userId: req.userId }),
+      Device.deleteMany({ userId: req.userId }),
+      Session.deleteMany({ userId: req.userId })
+    ]);
+
+    await User.deleteOne({ _id: req.userId });
+
+    // Log after deletion (audit log kept for forensics)
     await AuditLog.create({
       userId: req.userId,
       userUuid: req.userUuid,
@@ -113,18 +125,6 @@ export const deleteAccount = async (req, res, next) => {
       userAgent: req.headers['user-agent'],
       requestId: req.id
     });
-
-    // Hard delete all associated data
-    await Promise.all([
-      VaultItem.deleteMany({ userId: req.userId }),
-      Category.deleteMany({ userId: req.userId }),
-      Template.deleteMany({ userId: req.userId }),
-      Device.deleteMany({ userId: req.userId }),
-      Session.deleteMany({ userId: req.userId }),
-      AuditLog.deleteMany({ userId: req.userId })
-    ]);
-
-    await User.deleteOne({ _id: req.userId });
 
     // Clear cookies
     res.cookie('access_token', '', { ...securityConfig.cookie, maxAge: 0 });

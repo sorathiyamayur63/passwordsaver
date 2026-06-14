@@ -24,7 +24,7 @@ import accountRouter from './src/routes/account.js';
 import backupRouter from './src/routes/backup.js';
 
 const app = express();
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 // 1. Strict Security Headers
 app.use(helmet({
   contentSecurityPolicy: {
@@ -62,8 +62,8 @@ app.use(cors({
 
 // 3. Body Parsers & Security Sanitizers
 app.use(compression());
-app.use(express.json({ limit: '1000kb' }));
-app.use(express.urlencoded({ extended: false, limit: '1000kb' }));
+app.use(express.json({ limit: '256kb' }));
+app.use(express.urlencoded({ extended: false, limit: '256kb' }));
 app.use(cookieParser());
 app.use(mongoSanitize()); // Prevent NoSQL injection
 app.use(hpp()); // Prevent HTTP Parameter Pollution

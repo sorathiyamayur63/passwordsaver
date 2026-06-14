@@ -21,7 +21,7 @@ router.use(requireAuth);
 
 router.get('/', apiLimiter, getCategories);
 router.post('/', vaultLimiter, validateCategoryBody, createCategory);
-router.put('/reorder', reorderCategories);
+router.put('/reorder', vaultLimiter, reorderCategories);
 router.put('/:uuid', vaultLimiter, verifyOwnership(Category), validateCategoryBody, updateCategory);
 router.delete('/:uuid', vaultLimiter, verifyOwnership(Category), deleteCategory);
 

@@ -30,6 +30,20 @@ export const restoreFromBackup = async (req, res, next) => {
   try {
     const { items = [], categories = [], templates = [], mode = 'merge' } = req.body;
 
+    // Security: Limit import sizes to prevent DB flooding
+    const MAX_ITEMS = 500, MAX_CATEGORIES = 50, MAX_TEMPLATES = 50;
+    if (items.length > MAX_ITEMS) return res.status(400).json({ success: false, message: `Too many items. Maximum is ${MAX_ITEMS}.` });
+    if (categories.length > MAX_CATEGORIES) return res.status(400).json({ success: false, message: `Too many categories. Maximum is ${MAX_CATEGORIES}.` });
+    if (templates.length > MAX_TEMPLATES) return res.status(400).json({ success: false, message: `Too many templates. Maximum is ${MAX_TEMPLATES}.` });
+
+    // Validate required encrypted fields on each item
+    const invalidItem = items.find(i => !i.encryptedData || !i.iv || !i.authTag || !i.itemType);
+    if (invalidItem) return res.status(400).json({ success: false, message: 'Invalid item in backup: missing required encrypted fields.' });
+
+    if (mode !== 'merge' && mode !== 'replace') {
+      return res.status(400).json({ success: false, message: 'Mode must be "merge" or "replace".' });
+    }
+
     if (mode === 'replace') {
       await Promise.all([
         VaultItem.deleteMany({ userId: req.userId }),

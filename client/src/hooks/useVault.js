@@ -48,6 +48,8 @@ export const useVault = () => {
   //   }
   // };
 const fetchItems = useCallback(async (params = {}) => {
+  // Skip redundant fetch if data is fresh (< 30s) and no force flag
+  if (!params.force && store.isDataFresh()) return;
   try {
     store.setLoading(true);
     const res = await vaultApi.getVaultItems(params);
@@ -70,7 +72,9 @@ const fetchItems = useCallback(async (params = {}) => {
   //   }
   // };
 
-  const fetchCategories = useCallback(async () => {
+  const fetchCategories = useCallback(async (force = false) => {
+  // Skip if categories are fresh (< 60s) and no force flag
+  if (!force && store.isCategoriesFresh()) return;
   try {
     const res = await vaultApi.getCategories();
     store.setCategories(res.data.categories);

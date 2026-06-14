@@ -1,3 +1,5 @@
+import logger from '../utils/logger.js';
+
 export const antiCsrf = (req, res, next) => {
   // Safe methods skip CSRF check
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
@@ -10,18 +12,18 @@ export const antiCsrf = (req, res, next) => {
   //   console.error(`[CSRF BLOCK] Invalid Content-Type: ${contentType}`);
   //   return res.status(403).json({ success: false, message: 'Invalid Content-Type. Must be application/json.' });
   // }
-//change
+  // Ensure JSON content type on mutations that carry a body to prevent simple form POST attacks
   if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
-  const contentType = req.headers['content-type'];
-
-  if (!contentType || !contentType.includes('application/json')) {
-    console.error(`[CSRF BLOCK] Invalid Content-Type: ${contentType}`);
-    return res.status(403).json({
-      success: false,
-      message: 'Invalid Content-Type. Must be application/json.'
-    });
+    const contentType = req.headers['content-type'];
+    
+    if (!contentType || !contentType.includes('application/json')) {
+      logger.warn(`[CSRF BLOCK] Invalid Content-Type: ${contentType}`);
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid Content-Type. Must be application/json.'
+      });
+    }
   }
-}
 
   // Enforce strict Origin matching if Origin is present
   const origin = req.headers['origin'];
@@ -37,7 +39,7 @@ export const antiCsrf = (req, res, next) => {
   }
   
   if (origin && !allowedOrigins.includes(origin)) {
-    console.error(`[CSRF BLOCK] Origin mismatch! Browser sent: "${origin}", but server only allows: "${allowedOrigins.join(', ')}"`);
+    logger.warn(`[CSRF BLOCK] Origin mismatch! Browser sent: "${origin}", but server only allows: "${allowedOrigins.join(', ')}"`);
     return res.status(403).json({ success: false, message: 'CORS/CSRF policy blocked this request.' });
   }
 

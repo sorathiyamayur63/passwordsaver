@@ -19,7 +19,7 @@ export const validateRegister = [
     .matches(/^[a-zA-Z0-9_]+$/)
     .withMessage('Username must be 3-30 characters containing only letters, numbers, and underscores'),
   body('password')
-    .isLength({ min: 8 })
+    .isLength({ min: 8, max: 128 })
     .withMessage('Password must be at least 8 characters long')
     .custom((val) => {
       if (!/[A-Z]/.test(val)) throw new Error('Password must contain at least one uppercase letter');
@@ -38,6 +38,6 @@ export const validateRegister = [
 
 export const validateLogin = [
   body('username').trim().notEmpty().withMessage('Username is required'),
-  body('password').notEmpty().withMessage('Password is required'),
+  body('password').notEmpty().isLength({ max: 128 }).withMessage('Password is required'),
   handleValidationErrors
 ];

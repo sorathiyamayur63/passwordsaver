@@ -5,6 +5,7 @@ import { hashPassword, verifyPassword, generateTokenPair, verifyRefreshToken } f
 import { getOrCreateDevice, hashIp, getDeviceFingerprint } from '../services/deviceService.js';
 import { createSession, validateRefreshToken, invalidateSession, invalidateAllUserSessions, rotateRefreshToken } from '../services/sessionService.js';
 import { securityConfig } from '../config/security.js';
+import logger from '../utils/logger.js';
 
 const getClientIp = (req) => {
   let ip =
@@ -42,7 +43,7 @@ export const register = async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
-    const existingUser = await User.findOne({ username: new RegExp(`^${username}$`, 'i') });
+    const existingUser = await User.findOne({ username: username.toLowerCase() });
     if (existingUser) {
       return res.status(409).json({ success: false, message: 'Username is already taken' });
     }
@@ -106,7 +107,7 @@ export const login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
-    const user = await User.findOne({ username: new RegExp(`^${username}$`, 'i') }).select('+passwordHash +vaultKeySalt');
+    const user = await User.findOne({ username: username.toLowerCase() }).select('+passwordHash +vaultKeySalt');
     
     if (!user) {
       // Timing attack mitigation: Perform dummy hash to equalize processing time

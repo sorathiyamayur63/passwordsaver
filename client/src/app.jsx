@@ -92,16 +92,10 @@ function App() {
 
   useEffect(() => {
     const handleUnauthorized = () => {
-      // prevent redirect loop
+      // Prevent redirect loop
       if (window.location.pathname === '/login') {
         return;
       }
-
-      console.log('Session expired/revoked');
-
-      // clear frontend auth
-      localStorage.removeItem('user');
-      localStorage.removeItem('vault');
 
       window.location.replace('/login');
     };

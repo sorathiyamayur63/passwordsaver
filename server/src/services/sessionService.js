@@ -53,7 +53,7 @@ export const invalidateAllUserSessions = async (userId) => {
 };
 
 export const rotateRefreshToken = async (oldSession, userId, userUuid) => {
-  const tokens = generateTokenPair(userId, userUuid);
+  const tokens = generateTokenPair(userId, userUuid, oldSession.deviceUuid);
   const newRefreshTokenHash = hashToken(tokens.refreshToken);
 
   await Session.updateOne(

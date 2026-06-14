@@ -1,5 +1,6 @@
 import { verifyAccessToken } from '../services/authService.js';
 import { User, Session } from '../models/index.js';
+import logger from '../utils/logger.js';
 
 export const requireAuth = async (req, res, next) => {
   try {
@@ -73,7 +74,7 @@ export const requireAuth = async (req, res, next) => {
 
   } catch (error) {
 
-    console.error(error);
+    logger.warn('Auth token verification failed', { error: error.message });
 
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
