@@ -37,7 +37,8 @@ app.use(helmet({
       connectSrc: [
       "'self'",
       "https://passwordsaver-xv0f.onrender.com",
-      "https://passwordsaver-peach.vercel.app"
+      "https://passwordsaver-peach.vercel.app",
+      "https://api.saveyourpass.qzz.io"
     ],
       frameAncestors: ["'none'"],
       formAction: ["'self'"]
