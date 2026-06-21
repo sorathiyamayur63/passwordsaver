@@ -717,7 +717,6 @@ function Footer() {
         </div>
 
         <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-          <span style={{ fontSize: 13, color: T.textSec, fontWeight: 500 }}>© {new Date().getFullYear()} passwordsaver. All rights reserved.</span>
         </div>
       </div>
     </footer>
