@@ -284,14 +284,14 @@ export const GroupDetailPage = () => {
             label="Full Name"
             value={formFullName}
             onChange={(e) => setFormFullName(e.target.value)}
-            placeholder="e.g. John Doe"
+            placeholder="e.g. Mayur Sorathiya"
             autoFocus
           />
           <Input
             label="Nickname (Optional)"
             value={formNickname}
             onChange={(e) => setFormNickname(e.target.value)}
-            placeholder="e.g. Dad"
+            placeholder="e.g. Brother"
           />
         </div>
       </Modal>
