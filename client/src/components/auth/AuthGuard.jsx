@@ -6,7 +6,7 @@ import { Spinner } from '../ui';
 
 export const AuthGuard = () => {
   const { isAuthenticated, isLoading } = useAuthStore();
-  const location = useLocation();
+  const location = window.location;
 
   if (isLoading) {
     return (
@@ -17,12 +17,12 @@ export const AuthGuard = () => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
   // Vault key missing from memory (e.g., page refresh or idle timeout)
   if (!isVaultUnlocked() && location.pathname !== '/unlock') {
-    return <Navigate to="/unlock" state={{ from: location }} replace />;
+    return <Navigate to="/unlock" state={{ from: location.pathname }} replace />;
   }
 
   return <Outlet />;

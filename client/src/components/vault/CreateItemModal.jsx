@@ -14,7 +14,7 @@ const ITEM_TYPES = [
   { id: 'secure_note', name: 'Secure Note', desc: 'Encrypted free-form text' },
 ];
 
-export const CreateItemModal = ({ isOpen, onClose, prefilledPassword = '' }) => {
+export const CreateItemModal = ({ isOpen, onClose, prefilledPassword = '', personUuid = null, groupUuid = null }) => {
   const [step, setStep] = useState(1);
   const [selectedType, setSelectedType] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -82,6 +82,10 @@ export const CreateItemModal = ({ isOpen, onClose, prefilledPassword = '' }) => 
     const payload = selectedType?.id === 'custom' && selectedType.template?.uuid
       ? { ...formData, templateUuid: selectedType.template.uuid }
       : formData;
+
+    // Inject person/group context if creating item for a person
+    if (personUuid) payload.personUuid = personUuid;
+    if (groupUuid) payload.groupUuid = groupUuid;
 
     const success = await createItem(payload, selectedType.id, finalCategoryUuid);
     setLoading(false);

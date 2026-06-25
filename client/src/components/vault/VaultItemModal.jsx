@@ -80,7 +80,7 @@ export const VaultItemModal = ({ isOpen, onClose, item, onUpdate, onDelete, temp
         <div className="flex items-center gap-3">
           <FaviconOrIcon url={data?.website || data?.url} type={item.itemType} className="h-6 w-6 object-contain" fallbackClassName="h-5 w-5 text-[var(--accent)]" />
           <span>{data.title || 'View Item'}</span>
-          <Badge className="ml-2">{item.itemType.replace('_', ' ')}</Badge>
+          <Badge className="ml-2">{(item.itemType || 'unknown').replace('_', ' ')}</Badge>
         </div>
       }
     >
@@ -100,7 +100,7 @@ export const VaultItemModal = ({ isOpen, onClose, item, onUpdate, onDelete, temp
           )}
           
           <div className="grid grid-cols-1 gap-4">
-            {Object.entries(data).filter(([k]) => k !== 'title' && k !== 'templateUuid' && k !== 'categoryUuid').map(([key, value]) => {
+            {Object.entries(data).filter(([k]) => k !== 'title' && k !== 'templateUuid' && k !== 'categoryUuid' && k !== '_error' && k !== 'personUuid' && k !== 'groupUuid').map(([key, value]) => {
               
               // FIX 1: Safely check for empty strings or nulls, but DO NOT skip 'false' booleans!
               if (value === '' || value === null || value === undefined) return null;
@@ -125,7 +125,9 @@ export const VaultItemModal = ({ isOpen, onClose, item, onUpdate, onDelete, temp
                     ) : isSensitive ? (
                       <MaskedField value={value} />
                     ) : (
-                      <span className="text-sm text-[var(--text-primary)] truncate">{value}</span>
+                      <span className="text-sm text-[var(--text-primary)] truncate" title={typeof value === 'object' ? JSON.stringify(value) : String(value)}>
+                        {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                      </span>
                     )}
 
                     {/* Hide the copy button for checkboxes, since copying true/false doesn't make much sense */}
@@ -139,7 +141,11 @@ export const VaultItemModal = ({ isOpen, onClose, item, onUpdate, onDelete, temp
 
           <div className="flex justify-between pt-6 border-t border-[var(--border)]">
             <Button variant="danger" onClick={() => onDelete(item.uuid)}>Delete Item</Button>
-            <Button variant="primary" onClick={() => setIsEditing(true)}>Edit Item</Button>
+            {data._error ? (
+              <span className="text-sm text-[var(--text-muted)] italic self-center">Cannot edit — decryption failed</span>
+            ) : (
+              <Button variant="primary" onClick={() => setIsEditing(true)}>Edit Item</Button>
+            )}
           </div>
         </div>
       ) : (

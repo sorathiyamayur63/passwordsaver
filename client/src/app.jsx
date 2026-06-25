@@ -44,9 +44,12 @@ const BackupsPage = lazy(() => import('./pages/BackupsPage').then(module => ({ d
 const CategoriesPage = lazy(() => import('./pages/CategoriesPage').then(module => ({ default: module.CategoriesPage })));
 const FavoritesPage = lazy(() => import('./pages/vault/FavoritesPage').then(module => ({ default: module.FavoritesPage })));
 const TrashPage = lazy(() => import('./pages/vault/TrashPage').then(module => ({ default: module.TrashPage })));
+const GroupsPage = lazy(() => import('./pages/GroupsPage').then(module => ({ default: module.GroupsPage })));
+const GroupDetailPage = lazy(() => import('./pages/GroupDetailPage').then(module => ({ default: module.GroupDetailPage })));
+const PersonVaultPage = lazy(() => import('./pages/PersonVaultPage').then(module => ({ default: module.PersonVaultPage })));
 
 const FallbackLoader = () => (
-  <div className="flex h-[50vh] w-full items-center justify-center"><Spinner size="lg" /></div>
+  <div className="flex py-12 w-full items-center justify-center"><Spinner size="md" /></div>
 );
 
 const PUBLIC_PATHS = [
@@ -150,6 +153,11 @@ function App() {
                   <Route path="/settings" element={<Suspense fallback={<FallbackLoader />}><SettingsPage /></Suspense>} />
                   <Route path="/profile" element={<Suspense fallback={<FallbackLoader />}><ProfilePage /></Suspense>} />
                   <Route path="/categories" element={<Suspense fallback={<FallbackLoader />}><CategoriesPage /></Suspense>} />
+                  
+                  {/* Groups */}
+                  <Route path="/groups" element={<Suspense fallback={<FallbackLoader />}><GroupsPage /></Suspense>} />
+                  <Route path="/groups/:groupUuid" element={<Suspense fallback={<FallbackLoader />}><GroupDetailPage /></Suspense>} />
+                  <Route path="/groups/:groupUuid/people/:personUuid" element={<Suspense fallback={<FallbackLoader />}><PersonVaultPage /></Suspense>} />
                   
                   {/* Fallback route within application */}
                   <Route path="/app/*" element={<Navigate to="/dashboard" replace />} />

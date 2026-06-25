@@ -27,7 +27,7 @@ export const downloadBackupFile = (backupObject) => {
   const dateStr = new Date().toISOString().split('T')[0];
   const a = document.createElement('a');
   a.href = url;
-  a.download = `passwordsaver-backup-${dateStr}.psv`;
+  a.download = `passwordsaver-backup-${dateStr}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

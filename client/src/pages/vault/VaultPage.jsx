@@ -13,7 +13,7 @@ export const VaultPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { items, categories, isLoading, viewMode, setViewMode, searchQuery, setSearchQuery, fetchItems, fetchCategories, updateItem, deleteItem, toggleFavorite } = useVault();
+  const { items, categories, isLoading, isFetching, viewMode, setViewMode, searchQuery, setSearchQuery, fetchItems, fetchCategories, updateItem, deleteItem, toggleFavorite } = useVault();
   
   const [selectedItem, setSelectedItem] = useState(null);
   const [customTemplates, setCustomTemplates] = useState([]);
@@ -51,7 +51,7 @@ export const VaultPage = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [fetchItems, fetchCategories]);
   
   useEffect(() => {
     if (!itemUuid || !items.length) return;
@@ -106,7 +106,10 @@ export const VaultPage = () => {
     <div className="h-full flex flex-col space-y-6 animate-fadeIn">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]">My Vault</h1>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+            My Vault
+            {isFetching && !isLoading && <Spinner size="sm" className="opacity-50" />}
+          </h1>
           <p className="text-sm text-[var(--text-secondary)] mt-1">{items.length} secured items</p>
         </div>
         

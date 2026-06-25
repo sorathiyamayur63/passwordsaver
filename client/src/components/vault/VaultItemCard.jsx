@@ -31,13 +31,13 @@ export const VaultItemCard = ({ item, viewMode = 'list', onClick, onToggleFavori
         <div className="flex-1 min-w-0">
           <h4 className="text-sm font-semibold text-[var(--text-primary)] truncate">{title}</h4>
           <p className="text-xs text-[var(--text-muted)] truncate">
-            {decryptedData?.username || decryptedData?.website || itemType.replace('_', ' ')}
+            {decryptedData?.username || decryptedData?.website || (itemType || 'unknown').replace('_', ' ')}
           </p>
         </div>
 
         <div className="hidden sm:flex items-center gap-4 text-xs text-[var(--text-muted)] whitespace-nowrap">
-          <span>{formatDistanceToNow(new Date(lastModifiedAt))} ago</span>
-          <Badge variant="default" size="sm">{itemType.replace('_', ' ')}</Badge>
+          <span>{lastModifiedAt ? formatDistanceToNow(new Date(lastModifiedAt)) + ' ago' : ''}</span>
+          <Badge variant="default" size="sm">{(itemType || 'unknown').replace('_', ' ')}</Badge>
         </div>
 
         <div className="flex items-center gap-1 shrink-0">
@@ -68,10 +68,10 @@ export const VaultItemCard = ({ item, viewMode = 'list', onClick, onToggleFavori
       </div>
       <h4 className="text-base font-semibold text-[var(--text-primary)] truncate mb-1">{title}</h4>
       <p className="text-sm text-[var(--text-muted)] truncate mb-4 flex-1">
-        {decryptedData?.username || itemType.replace('_', ' ')}
+        {decryptedData?.username || (itemType || 'unknown').replace('_', ' ')}
       </p>
       <div className="text-xs text-[var(--text-disabled)] mt-auto pt-4 border-t border-[var(--border)]">
-        Updated {formatDistanceToNow(new Date(lastModifiedAt))} ago
+        {lastModifiedAt ? `Updated ${formatDistanceToNow(new Date(lastModifiedAt))} ago` : 'Recently added'}
       </div>
     </Card>
   );

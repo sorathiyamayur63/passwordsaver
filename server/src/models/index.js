@@ -5,6 +5,8 @@ import { Template } from './Template.js';
 import { Device } from './Device.js';
 import { Session } from './Session.js';
 import { AuditLog } from './AuditLog.js';
+import { Group } from './Group.js';
+import { Person } from './Person.js';
 
 export {
   User,
@@ -13,5 +15,7 @@ export {
   Template,
   Device,
   Session,
-  AuditLog
+  AuditLog,
+  Group,
+  Person
 };

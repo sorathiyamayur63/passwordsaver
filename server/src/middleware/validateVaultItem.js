@@ -12,6 +12,7 @@ export const validateCreateVaultItem = [
   ]).withMessage('Invalid item type'),
   body('encryptedTitle').optional({ checkFalsy: true }).isString(),
   body('titleIv').optional({ checkFalsy: true }).isString(),
+  body('titleAuthTag').optional({ checkFalsy: true }).isString(),
   body('categoryUuid').optional({ checkFalsy: true }).isUUID(4).withMessage('Category must be a valid UUID'),
   body('tags').optional().isArray().withMessage('Tags must be an array')
     .custom(arr => arr.every(t => typeof t === 'string' && t.length <= 50))

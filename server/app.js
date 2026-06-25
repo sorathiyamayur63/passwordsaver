@@ -22,6 +22,8 @@ import templatesRouter from './src/routes/templates.js';
 import devicesRouter from './src/routes/devices.js';
 import accountRouter from './src/routes/account.js';
 import backupRouter from './src/routes/backup.js';
+import groupsRouter from './src/routes/groups.js';
+import notificationsRouter from './src/routes/notifications.js';
 
 const app = express();
 app.set('trust proxy', 1);
@@ -89,6 +91,8 @@ app.use('/api/templates', templatesRouter);
 app.use('/api/devices', devicesRouter);
 app.use('/api/account', accountRouter);
 app.use('/api/backup', backupRouter);
+app.use('/api/groups', groupsRouter);
+app.use('/api/notifications', notificationsRouter);
 
 // 8. 404 Fallback
 app.use((req, res, next) => {

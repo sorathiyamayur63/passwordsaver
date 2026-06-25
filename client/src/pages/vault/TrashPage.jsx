@@ -77,7 +77,7 @@ export const TrashPage = () => {
     }
   };
 
-  if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>;
+  // Loader moved inline
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 animate-fadeIn">
@@ -91,7 +91,9 @@ export const TrashPage = () => {
         </Button>
       </div>
 
-      {trashItems.length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center py-20"><Spinner size="lg" /></div>
+      ) : trashItems.length === 0 ? (
         <EmptyState 
           icon={ShieldAlert} 
           title="Trash is empty" 

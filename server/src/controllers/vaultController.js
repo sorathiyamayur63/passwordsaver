@@ -14,6 +14,8 @@ export const getVaultItems = async (req, res, next) => {
     if (req.query.categoryUuid) query.categoryUuid = req.query.categoryUuid;
     if (req.query.isFavorite !== undefined) query.isFavorite = req.query.isFavorite === 'true';
     if (req.query.isArchived !== undefined) query.isArchived = req.query.isArchived === 'true';
+    if (req.query.personUuid) query.personUuid = req.query.personUuid;
+    if (req.query.groupUuid) query.groupUuid = req.query.groupUuid;
 
     // Sorting
     const validSortFields = ['lastModifiedAt', 'createdAt', 'lastUsedAt'];
@@ -60,7 +62,7 @@ export const createVaultItem = async (req, res, next) => {
   try {
     const { 
       encryptedData, iv, authTag, itemType, 
-      encryptedTitle, titleIv, categoryUuid, tags 
+      encryptedTitle, titleIv, titleAuthTag, categoryUuid, personUuid, groupUuid, tags 
     } = req.body;
 
     if (categoryUuid) {
@@ -77,7 +79,10 @@ export const createVaultItem = async (req, res, next) => {
       itemType,
       encryptedTitle,
       titleIv,
+      titleAuthTag,
       categoryUuid,
+      personUuid: personUuid || null,
+      groupUuid: groupUuid || null,
       tags: tags || []
     });
 
@@ -118,7 +123,7 @@ export const updateVaultItem = async (req, res, next) => {
       item.categoryUuid = updates.categoryUuid;
     }
 
-    const updatableFields = ['encryptedData', 'iv', 'authTag', 'encryptedTitle', 'titleIv', 'isFavorite', 'isArchived', 'tags'];
+    const updatableFields = ['encryptedData', 'iv', 'authTag', 'encryptedTitle', 'titleIv', 'titleAuthTag', 'isFavorite', 'isArchived', 'tags', 'personUuid', 'groupUuid'];
     updatableFields.forEach(field => {
       if (updates[field] !== undefined) item[field] = updates[field];
     });
@@ -353,6 +358,51 @@ export const getRecentItems = async (req, res, next) => {
       success: true,
       data: { recentlyUsed, recentlyCreated, recentlyModified }
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const bulkUpdateVaultItems = async (req, res, next) => {
+  try {
+    const { items } = req.body;
+    
+    if (!Array.isArray(items)) {
+      return res.status(400).json({ success: false, message: 'Items must be an array' });
+    }
+
+    const bulkOps = items.map(item => ({
+      updateOne: {
+        filter: { uuid: item.uuid, userId: req.userId },
+        update: {
+          $set: {
+            encryptedData: item.encryptedData,
+            iv: item.iv,
+            authTag: item.authTag,
+            encryptedTitle: item.encryptedTitle,
+            titleIv: item.titleIv,
+            titleAuthTag: item.titleAuthTag,
+            lastModifiedAt: new Date()
+          }
+        }
+      }
+    }));
+
+    if (bulkOps.length > 0) {
+      await VaultItem.bulkWrite(bulkOps);
+    }
+    
+    await AuditLog.create({
+      userId: req.userId,
+      userUuid: req.userUuid,
+      action: 'VAULT_UPDATE',
+      details: { action: 'bulk_reencrypt', count: items.length },
+      ipHash: hashIp(req.ip),
+      userAgent: req.headers['user-agent'],
+      requestId: req.id
+    });
+
+    res.status(200).json({ success: true, message: 'Items updated successfully' });
   } catch (error) {
     next(error);
   }

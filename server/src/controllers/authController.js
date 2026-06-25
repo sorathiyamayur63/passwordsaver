@@ -1,6 +1,6 @@
 import argon2 from 'argon2';
 import crypto from 'crypto';
-import { User, Category, AuditLog, Device } from '../models/index.js';
+import { User, Category, AuditLog, Device, Group } from '../models/index.js';
 import { hashPassword, verifyPassword, generateTokenPair, verifyRefreshToken } from '../services/authService.js';
 import { getOrCreateDevice, hashIp, getDeviceFingerprint } from '../services/deviceService.js';
 import { createSession, validateRefreshToken, invalidateSession, invalidateAllUserSessions, rotateRefreshToken } from '../services/sessionService.js';
@@ -62,6 +62,10 @@ export const register = async (req, res, next) => {
 
     const defaultCategories = Category.getDefaultsForUser(user._id);
     await Category.insertMany(defaultCategories);
+
+    // Create default groups
+    const defaultGroups = Group.getDefaultsForUser(user._id);
+    await Group.insertMany(defaultGroups);
 
     const device = await getOrCreateDevice(user._id, req);
     const tokens = generateTokenPair(user._id, user.uuid, device.uuid);

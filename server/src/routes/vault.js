@@ -19,6 +19,7 @@ router.get('/:uuid', apiLimiter, verifyOwnership(VaultItem), vaultController.get
 
 // Mutations (Stricter Vault Limiter to prevent brute force flooding)
 router.post('/', vaultLimiter, validateCreateVaultItem, vaultController.createVaultItem);
+router.post('/bulk-update', vaultLimiter, vaultController.bulkUpdateVaultItems);
 router.post('/trash/empty', vaultLimiter, vaultController.emptyTrash);
 
 router.put('/:uuid', vaultLimiter, verifyOwnership(VaultItem), validateUpdateVaultItem, vaultController.updateVaultItem);

@@ -41,6 +41,14 @@ const vaultItemSchema = new mongoose.Schema({
   categoryUuid: { 
     type: String 
   },
+  personUuid: {
+    type: String,
+    default: null
+  },
+  groupUuid: {
+    type: String,
+    default: null
+  },
   templateUuid: { 
     type: String 
   },
@@ -49,6 +57,9 @@ const vaultItemSchema = new mongoose.Schema({
   },
   titleIv: { 
     type: String 
+  },
+  titleAuthTag: {
+    type: String
   },
   isFavorite: { 
     type: Boolean, 
@@ -88,5 +99,6 @@ vaultItemSchema.index({ userId: 1, itemType: 1, isDeleted: 1 });
 vaultItemSchema.index({ userId: 1, isFavorite: 1, isDeleted: 1 });
 vaultItemSchema.index({ userId: 1, lastUsedAt: -1 });
 vaultItemSchema.index({ categoryUuid: 1 });
+vaultItemSchema.index({ userId: 1, personUuid: 1, isDeleted: 1 });
 
 export const VaultItem = mongoose.model('VaultItem', vaultItemSchema);

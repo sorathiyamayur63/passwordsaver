@@ -22,6 +22,7 @@ export const vaultApi = {
   getVaultItem: (uuid) => api.get(`/vault/${uuid}`),
   createVaultItem: (data) => api.post('/vault', data),
   updateVaultItem: (uuid, data) => api.put(`/vault/${uuid}`, data),
+  bulkUpdateVaultItems: (items) => api.post('/vault/bulk-update', { items }),
   deleteVaultItem: (uuid) => api.delete(`/vault/${uuid}`),
   permanentDeleteVaultItem: (uuid) => api.delete(`/vault/${uuid}/permanent`),
   restoreVaultItem: (uuid) => api.post(`/vault/${uuid}/restore`, {}),

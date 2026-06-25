@@ -102,16 +102,19 @@ export const CategorySelector = ({ value, onChange, categories: propCategories }
                   Create new category
                 </button>
               ) : (
-                <div className="p-2 flex items-center gap-2">
+                <div className="p-2 flex items-center gap-2" onKeyDown={(e) => e.stopPropagation()}>
                   <Input
                     placeholder="Category name"
                     value={newCatName}
                     onChange={(e) => setNewCatName(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleCreateNew(); } }}
+                    onKeyDown={(e) => { 
+                      e.stopPropagation();
+                      if (e.key === 'Enter') { e.preventDefault(); handleCreateNew(); } 
+                    }}
                     autoFocus
                     className="flex-1"
                   />
-                  <Button size="sm" onClick={handleCreateNew} loading={saving} disabled={!newCatName.trim()}>
+                  <Button type="button" size="sm" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleCreateNew(); }} loading={saving} disabled={!newCatName.trim()}>
                     Add
                   </Button>
                 </div>
