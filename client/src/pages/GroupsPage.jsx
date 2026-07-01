@@ -236,7 +236,7 @@ export const GroupsPage = () => {
                   key={key}
                   type="button"
                   onClick={() => setFormIcon(key)}
-                  className={`p-2 rounded-lg border transition-all ${formIcon === key ? 'border-[var(--accent)] bg-[var(--accent-subtle)]' : 'border-[var(--border)] hover:border-[var(--text-muted)]'}`}
+                  className={`p-2 rounded-lg border transition-all ${formIcon === key ? 'border-[var(--accent)] bg-[var(---subtle)]' : 'border-[var(--border)] hover:border-[var(--text-muted)]'}`}
                 >
                   <Icon className="h-5 w-5" style={{ color: formIcon === key ? formColor : 'var(--text-muted)' }} />
                 </button>
