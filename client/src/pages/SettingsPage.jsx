@@ -1,23 +1,50 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Shield, Monitor, Lock, Download, Bell } from 'lucide-react';
 import { Card, Button, Toggle } from '../components/ui';
 import { ChangePasswordForm } from '../components/settings/ChangePasswordForm';
 import { DangerZone } from '../components/settings/DangerZone';
-import { accountApi } from '../services/accountApi';
 import { useTheme } from '../store/themeStore';
+import { backupApi } from '../services/backupApi';
+import { useAuthStore } from '../store/authStore';
+import { getKey } from '../crypto';
+import { exportVaultAsEncryptedJSON, downloadBackupFileAsJSON } from '../utils/backupUtils';
+import toast from 'react-hot-toast';
 import { cn } from '../utils/cn';
 
 export const SettingsPage = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.state?.tab || 'security');
   const { theme, setTheme } = useTheme();
+  const { user } = useAuthStore();
+  const [exportingData, setExportingData] = useState(false);
 
   useEffect(() => {
     if (location.state?.tab) {
       setActiveTab(location.state.tab);
     }
   }, [location.state?.tab]);
+
+  const handleExportData = useCallback(async () => {
+    setExportingData(true);
+    try {
+      const res = await backupApi.getBackupPayload();
+      const currentKey = getKey();
+      const backupObj = await exportVaultAsEncryptedJSON(
+        res.data.items,
+        res.data.categories,
+        res.data.templates,
+        currentKey,
+        user?.uuid
+      );
+      downloadBackupFileAsJSON(backupObj);
+      toast.success('Encrypted backup downloaded as JSON');
+    } catch (err) {
+      toast.error('Failed to export data');
+    } finally {
+      setExportingData(false);
+    }
+  }, [user]);
 
   const TABS = [
     { id: 'security', label: 'Security', icon: Shield },
@@ -119,7 +146,7 @@ export const SettingsPage = () => {
                 <p className="text-sm text-[var(--text-secondary)] mb-4">
                   Download a complete backup of your vault. Your vault is exported in its encrypted form. Only you can decrypt it using your Password.
                 </p>
-                <Button leftIcon={Download} variant="secondary" onClick={accountApi.exportData}>Download Encrypted Backup</Button>
+                <Button leftIcon={Download} variant="secondary" loading={exportingData} onClick={handleExportData}>Download Encrypted Backup (.json)</Button>
               </Card>
 
               <DangerZone />
