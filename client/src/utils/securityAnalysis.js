@@ -114,7 +114,18 @@ export const findExpiringItems = (items) => {
 
 export const calculateVaultHealthScore = (items) => {
   if (!items || items.length === 0) {
-    return { score: 0, grade: 'N/A', breakdown: {}, recommendations: ["Add items to your vault to generate a security score."] };
+    return {
+      score: 0,
+      grade: 'N/A',
+      breakdown: { weak: 0, reused: 0, old: 0, expiry: 0 },
+      recommendations: ['Add items to your vault to generate a security score.'],
+      raw: {
+        passStrength: { weak: [], fair: [], strong: [], summary: { total: 0, weakCount: 0, fairCount: 0, strongCount: 0 } },
+        reused: [],
+        old: [],
+        expiring: { expiringSoon: [], expired: [] }
+      }
+    };
   }
 
   const passStrength = analyzePasswordStrength(items);
