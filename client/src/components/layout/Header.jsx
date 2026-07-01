@@ -1,28 +1,36 @@
 import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, Search, Sun, Moon, Bell, User, LogOut, Settings, LockKeyhole, Shield, Key, Clock, Trash2, CheckCheck } from 'lucide-react';
-import { useThemeStore } from '../../store/themeStore';
+import { Menu, Search, Sun, Moon, Bell, User, LogOut, Settings, LockKeyhole, Shield, Key, Clock, Trash2, CheckCheck, MapPin } from 'lucide-react';
+import { useTheme } from '../../store/themeStore';
 import { useAuthStore } from '../../store/authStore';
 import { lockVault } from '../../crypto';
 import { authApi } from '../../services/authApi';
 import toast from 'react-hot-toast';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 // ─── Notifications Dropdown ───────────────────────────────────────────────────
 const ACTION_META = {
-  VAULT_CREATE:    { label: 'Item added',         icon: Shield,   color: 'var(--success)' },
-  VAULT_UPDATE:    { label: 'Item updated',        icon: Shield,   color: 'var(--accent)' },
-  VAULT_DELETE:    { label: 'Item deleted',        icon: Trash2,   color: 'var(--danger)' },
-  VAULT_EXPORT:    { label: 'Vault exported',      icon: Key,      color: 'var(--warning)' },
-  PASSWORD_CHANGE: { label: 'Password changed',    icon: Key,      color: 'var(--warning)' },
-  LOGIN_SUCCESS:   { label: 'Signed in',           icon: User,     color: 'var(--success)' },
-  LOGIN_FAIL:      { label: 'Failed sign-in',      icon: User,     color: 'var(--danger)' },
-  BACKUP_EXPORT:   { label: 'Backup exported',     icon: Clock,    color: 'var(--accent)' },
-  BACKUP_IMPORT:   { label: 'Backup imported',     icon: Clock,    color: 'var(--accent)' },
-  CATEGORY_CREATE: { label: 'Category created',    icon: Shield,   color: 'var(--success)' },
-  GROUP_CREATE:    { label: 'Group created',       icon: User,     color: 'var(--success)' },
-  GROUP_DELETE:    { label: 'Group deleted',        icon: Trash2,   color: 'var(--danger)' },
-  PERSON_CREATE:   { label: 'Person added',        icon: User,     color: 'var(--success)' },
-  PERSON_DELETE:   { label: 'Person removed',      icon: Trash2,   color: 'var(--danger)' },
+  VAULT_CREATE:        { label: 'Item added',              icon: Shield,   color: '#10b981' },
+  VAULT_UPDATE:        { label: 'Item updated',             icon: Shield,   color: '#6366f1' },
+  VAULT_DELETE:        { label: 'Item moved to trash',      icon: Trash2,   color: '#ef4444' },
+  VAULT_EXPORT:        { label: 'Vault exported',           icon: Key,      color: '#f59e0b' },
+  PASSWORD_CHANGE:     { label: 'Password changed',         icon: Key,      color: '#f59e0b' },
+  LOGIN_SUCCESS:       { label: 'Signed in',                icon: User,     color: '#10b981' },
+  LOGIN_FAIL:          { label: 'Failed sign-in attempt',   icon: User,     color: '#ef4444' },
+  LOGIN_NEW_LOCATION:  { label: '⚠️ New location sign-in', icon: MapPin,   color: '#f97316' },
+  LOGOUT:              { label: 'Signed out',               icon: User,     color: '#6b7280' },
+  BACKUP_EXPORT:       { label: 'Backup exported',          icon: Clock,    color: '#6366f1' },
+  BACKUP_IMPORT:       { label: 'Backup imported',          icon: Clock,    color: '#6366f1' },
+  CATEGORY_CREATE:     { label: 'Category created',         icon: Shield,   color: '#10b981' },
+  CATEGORY_DELETE:     { label: 'Category deleted',         icon: Trash2,   color: '#ef4444' },
+  GROUP_CREATE:        { label: 'Group created',            icon: User,     color: '#10b981' },
+  GROUP_DELETE:        { label: 'Group deleted',            icon: Trash2,   color: '#ef4444' },
+  PERSON_CREATE:       { label: 'Person added',             icon: User,     color: '#10b981' },
+  PERSON_DELETE:       { label: 'Person removed',           icon: Trash2,   color: '#ef4444' },
+  TEMPLATE_CREATE:     { label: 'Template created',         icon: Shield,   color: '#10b981' },
+  TEMPLATE_DELETE:     { label: 'Template deleted',         icon: Trash2,   color: '#ef4444' },
+  ACCOUNT_UPDATE:      { label: 'Account updated',          icon: User,     color: '#6366f1' },
 };
 
 const timeAgo = (dateStr) => {
@@ -51,7 +59,7 @@ const NotificationsDropdown = memo(() => {
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/notifications', { credentials: 'include' });
+      const res = await fetch(`${API_URL}/api/notifications`, { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setNotifications(data.data?.notifications || []);
@@ -131,8 +139,13 @@ const NotificationsDropdown = memo(() => {
                     <IconComp className="h-3.5 w-3.5" style={{ color: meta.color }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-[var(--text-primary)]">{meta.label}</p>
-                    {n.resourceType && (
+                    <p className={`text-xs font-medium ${n.action === 'LOGIN_NEW_LOCATION' ? 'text-orange-500 dark:text-orange-400' : 'text-[var(--text-primary)]'}`}>
+                      {meta.label}
+                    </p>
+                    {n.action === 'LOGIN_NEW_LOCATION' && n.ipAddress && (
+                      <p className="text-xs text-[var(--text-muted)] truncate">From: {n.ipAddress}</p>
+                    )}
+                    {n.resourceType && n.action !== 'LOGIN_NEW_LOCATION' && (
                       <p className="text-xs text-[var(--text-muted)] truncate capitalize">{n.resourceType}</p>
                     )}
                     <p className="text-xs text-[var(--text-muted)] mt-0.5">{timeAgo(n.timestamp)}</p>
@@ -153,9 +166,8 @@ NotificationsDropdown.displayName = 'NotificationsDropdown';
 
 // ─── Header ───────────────────────────────────────────────────────────────────
 export const Header = memo(({ onMenuClick }) => {
-  // Use individual selectors to avoid re-renders when unrelated state changes
-  const isDark = useThemeStore(state => state.isDark);
-  const toggleTheme = useThemeStore(state => state.toggleTheme);
+  // useTheme() gives isDark + toggleTheme computed from resolvedTheme
+  const { isDark, toggleTheme } = useTheme();
   const user = useAuthStore(state => state.user);
   const navigate = useNavigate();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
