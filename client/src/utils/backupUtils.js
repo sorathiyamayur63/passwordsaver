@@ -19,11 +19,32 @@ export const exportVaultAsEncryptedJSON = async (vaultItems, categories, templat
   };
 };
 
+/**
+ * Download backup as .psv (PasswordSaver Vault) — used from Backups page
+ */
 export const downloadBackupFile = (backupObject) => {
+  const jsonString = JSON.stringify(backupObject, null, 2);
+  const blob = new Blob([jsonString], { type: 'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
+
+  const dateStr = new Date().toISOString().split('T')[0];
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `passwordsaver-backup-${dateStr}.psv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+/**
+ * Download backup as .json — used from Settings > Privacy & Data
+ */
+export const downloadBackupFileAsJSON = (backupObject) => {
   const jsonString = JSON.stringify(backupObject, null, 2);
   const blob = new Blob([jsonString], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
-  
+
   const dateStr = new Date().toISOString().split('T')[0];
   const a = document.createElement('a');
   a.href = url;
