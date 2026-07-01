@@ -38,7 +38,7 @@ export const ProfilePage = () => {
 
       <Card padding="lg" className="border-[var(--border)] flex flex-col md:flex-row items-start gap-8">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-32 w-32 rounded-full bg-[var(--accent-subtle)] border-4 border-[var(--bg-primary)] shadow-md flex items-center justify-center text-4xl font-bold text-[var(--accent)] uppercase tracking-wider">
+          <div className="h-32 w-32 rounded-full bg-[var(--accent-sutle)] border-4 border-[var(--bg-primary)] shadow-md flex items-center justify-center text-4xl font-bold text-[var(--accent)] uppercase tracking-wider">
             {user?.username.slice(0, 2)}
           </div>
           <span className="text-xs text-[var(--text-muted)] font-mono">ID: {user?.uuid.split('-')[0]}...</span>
